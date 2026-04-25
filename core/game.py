@@ -9,7 +9,7 @@ class Game:
                  first_scene: list[Entity]|None = None,
                  background_color: str = "black",
                  FPS: int = 60):
-        self.change_current_scene(first_scene)
+        self.change_current_scene(first_scene if first_scene else [])
         self.background_color = background_color
         self.FPS = FPS
 
@@ -32,7 +32,7 @@ class Game:
             for entity in self.current_scene:
                 entity.update(self.dt)
                 if entity.graphical:
-                    self.screen.blit(entity.graphical, entity.physical.topleft)
+                    self.screen.blit(entity.graphical, entity.physical)
             pygame.display.flip()
 
             self.dt = self.clock.tick(self.FPS) / 1000
