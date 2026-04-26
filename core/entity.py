@@ -23,3 +23,15 @@ class Entity:
         if self.physical.collidepoint(point):
             return True
         return False
+
+    def is_clicked(self) -> bool:
+        if self.is_on_point(pygame.mouse.get_pos()):
+            if self.game.pressed_mouse[0]:
+                return True
+        return False
+
+    def was_clicked(self) -> bool:
+        if self.is_on_point(pygame.mouse.get_pos()):
+            if self.game.just_pressed_mouse[0]:
+                return True
+        return False

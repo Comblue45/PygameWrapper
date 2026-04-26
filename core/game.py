@@ -20,33 +20,39 @@ class Game:
         self.dt = 0.0
         self.running = False
 
-        self.pressed_keys = {}
-        self.pressed_mouse = {key: False for key in range(0,3)}
+        self.pressed_keys = pygame.key.get_pressed()
+        self.pressed_mouse = pygame.mouse.get_pressed()
+
+        self.just_pressed_keys = {}
+        self.just_pressed_mouse = {key: False for key in range(0,3)}
 
     def start(self) -> None:
         self.running = True
 
         while self.running:
-            for key in self.pressed_keys.keys():
-                self.pressed_keys[key] = False
-            for key in self.pressed_mouse.keys():
-                self.pressed_mouse[key] = False
+            self.pressed_keys = pygame.key.get_pressed()
+            self.pressed_mouse = pygame.mouse.get_pressed()
+
+            for key in self.just_pressed_keys.keys():
+                self.just_pressed_keys[key] = False
+            for key in self.just_pressed_mouse.keys():
+                self.just_pressed_mouse[key] = False
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
 
                 if event.type == pygame.KEYDOWN:
-                    self.pressed_keys[event.key] = True
+                    self.just_pressed_keys[event.key] = True
             
 
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if event.button == 1:
-                        self.pressed_mouse[0] = True
+                        self.just_pressed_mouse[0] = True
                     elif event.button == 2:
-                        self.pressed_mouse[1] = True
+                        self.just_pressed_mouse[1] = True
                     elif event.button == 3:
-                        self.pressed_mouse[2] = True
+                        self.just_pressed_mouse[2] = True
 
             self.screen.fill("black")
             for entity in self.current_scene:
@@ -63,4 +69,4 @@ class Game:
             entity.ready(self)
     
     def add_pressed_key(self, key: int) -> None:
-        self.pressed_keys[key] = False
+        self.just_pressed_keys[key] = False
