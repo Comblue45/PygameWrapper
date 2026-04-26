@@ -18,3 +18,8 @@ class Entity:
         if self.physical.colliderect(other_entity.physical):
             return True
         return False
+
+    def is_on_point(self, point: tuple[int,int]) -> bool:
+        if self.physical.collidepoint(point):
+            return True
+        return False
