@@ -62,9 +62,8 @@ class Entity:
         return self.rect.topleft[0]
     @x.setter
     def x(self, new_value: int) -> None:
-        self.rect.topleft = (new_value, 
+        self.rect.topleft = (new_value,
                              self.rect.topleft[1])
-
     @property
     def y(self) -> int:
         return self.rect.topleft[1]

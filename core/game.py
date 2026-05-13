@@ -17,6 +17,10 @@ class Game:
         self.running = False
         self._rendering_tasks: list[RenderingTask] = []
 
+        self.just_pressed = {}
+        self.just_pressed_mouse = {k: False for k in range(0,4)}
+        print(self.just_pressed_mouse)
+
         self.setup_scene()
 
     def run(self) -> None:
@@ -33,9 +37,20 @@ class Game:
         self._prepare_next_frame()
 
     def _input(self) -> None:
+        self.just_pressed = {key: False for key in self.just_pressed.keys()}
+        self.just_pressed_mouse = {key: False for key in self.just_pressed_mouse.keys()}
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self.running = False
+            if event.type == pygame.KEYDOWN:
+                self.just_pressed[event.key] = True
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:
+                    self.just_pressed_mouse[0] = True
+                if event.button == 2:
+                    self.just_pressed_mouse[1] = True
+                if event.button == 3:
+                    self.just_pressed_mouse[2] = True
 
     def _handle_entities(self) -> None:
         for entity in self.scene:
@@ -77,3 +92,6 @@ class Game:
         entity.remove_parent()
         for child in list(entity.childern):
             entity.remove_child(child)
+    
+    def add_just_pressed_key(self, key: int) -> None:
+        self.just_pressed[key] = False
