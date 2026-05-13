@@ -1,37 +1,80 @@
-import pygame
+from __future__ import annotations
+from typing import TYPE_CHECKING
+from pygame import Surface, Rect
+
+if TYPE_CHECKING:
+    from .game import Game
 
 class Entity:
-
+    
     def __init__(self, 
-                 surface: pygame.Surface|None = None, 
-                 physical: pygame.Rect|None = None):
-        self.graphical = surface
-        self.physical = physical if physical else surface.get_rect() if surface else None
+                 image: Surface|None = None, 
+                 rect: Rect|None = None,
+                 parent: Entity|None = None,
+                 tags: set[str]|None = None,
+                 auto_rect: bool = True) -> None:
+        self.image = image
+        if rect:
+            self.rect = rect
+        elif auto_rect and image:
+            self.rect = self.image.get_rect()
+        else:
+            self.rect = Rect(0,0,0,0)
 
-    def ready(self, game) -> None:
+        self.parent = None
+        self.set_parent(parent) if parent else None
+        self.childern = []
+        self.tags = tags if tags else set()
+        self.game = None
+        self.visible = True
+
+    def set_parent(self, parent: Entity) -> None:
+        self.parent = parent
+        parent.childern.append(self)
+    def remove_parent(self) -> None:
+        self.parent.childern.remove(self)
+        self.parent = None
+    def add_child(self, child: Entity) -> None:
+        child.parent = self
+        self.childern.append(child)
+    def remove_child(self, child: Entity) -> None:
+        child.parent = None
+        self.childern.remove(child)
+
+    def setup(self, game: Game) -> None:
         self.game = game
+    def ready(self) -> None:
+        pass
+    def removed_from_scene(self) -> None:
+        pass
+    def destroy(self) -> None:
+        self.game.remove_entity(self)
 
+    def before_update(self) -> None:
+        pass
     def update(self, dt: float) -> None:
         pass
-    
-    def is_colliding(self, other_entity) -> bool:
-        if self.physical.colliderect(other_entity.physical):
-            return True
-        return False
+    def after_update(self) -> None:
+        pass
 
-    def is_on_point(self, point: tuple[int,int]) -> bool:
-        if self.physical.collidepoint(point):
-            return True
-        return False
+    @property
+    def x(self) -> int:
+        return self.rect.topleft[0]
+    @x.setter
+    def x(self, new_value: int) -> None:
+        self.rect.topleft = (new_value, 
+                             self.rect.topleft[1])
 
-    def is_clicked(self) -> bool:
-        if self.is_on_point(pygame.mouse.get_pos()):
-            if self.game.pressed_mouse[0]:
-                return True
-        return False
+    @property
+    def y(self) -> int:
+        return self.rect.topleft[1]
+    @y.setter
+    def y(self, new_value: int) -> None:
+        self.rect.topleft = (self.rect.topleft[0],
+                             new_value)
 
-    def was_clicked(self) -> bool:
-        if self.is_on_point(pygame.mouse.get_pos()):
-            if self.game.just_pressed_mouse[0]:
-                return True
-        return False
+    def world_position(self) -> tuple[int, int]:
+        if not self.parent:
+            return self.rect.topleft
+        px, py = self.parent.world_position()
+        return (self.x + px, self.y + py)

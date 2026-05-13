@@ -1,7 +1,7 @@
 from .game import Game
 from .entity import Entity
-from ..gui.text import Text
+from .rendering_task import RenderingTask
 
 __all__ = ["Game",
            "Entity",
-           "Text"]
+           "RenderingTask"]

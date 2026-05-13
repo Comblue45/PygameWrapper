@@ -1,16 +1,12 @@
-from .entity import Entity
 import pygame
+from .entity import Entity
+from .rendering_task import RenderingTask
 
 class Game:
 
-    def __init__(self,
-                 size: tuple[int, int] = (500, 500),
-                 title: str = "PygameHelper",
-                 first_scene: list[Entity]|None = None,
-                 background_color: str = "black",
-                 FPS: int = 60):
-        self.change_current_scene(first_scene if first_scene else [])
+    def __init__(self, title: str = "PygameWrapper", background_color: str = "black", size: tuple[int, int] = (500, 500), scene: list[Entity]|None = None, FPS: int = 60) -> None:
         self.background_color = background_color
+        self.scene = scene if scene else []
         self.FPS = FPS
 
         pygame.init()
@@ -19,54 +15,65 @@ class Game:
         self.clock = pygame.time.Clock()
         self.dt = 0.0
         self.running = False
+        self._rendering_tasks: list[RenderingTask] = []
 
-        self.pressed_keys = pygame.key.get_pressed()
-        self.pressed_mouse = pygame.mouse.get_pressed()
+        self.setup_scene()
 
-        self.just_pressed_keys = {}
-        self.just_pressed_mouse = {key: False for key in range(0,3)}
-
-    def start(self) -> None:
+    def run(self) -> None:
         self.running = True
 
         while self.running:
-            self.pressed_keys = pygame.key.get_pressed()
-            self.pressed_mouse = pygame.mouse.get_pressed()
+            self._update()
 
-            for key in self.just_pressed_keys.keys():
-                self.just_pressed_keys[key] = False
-            for key in self.just_pressed_mouse.keys():
-                self.just_pressed_mouse[key] = False
+    def _update(self) -> None:
+        self._input()
+        self._handle_entities()
+        self._render()
+        self._time()
+        self._prepare_next_frame()
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    self.running = False
+    def _input(self) -> None:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
 
-                if event.type == pygame.KEYDOWN:
-                    self.just_pressed_keys[event.key] = True
-            
+    def _handle_entities(self) -> None:
+        for entity in self.scene:
+            self._update_entity(entity)
+            self._prepare_entity_rendering(entity)
+    def _update_entity(self, entity: Entity) -> None:
+        entity.before_update()
+        entity.update(self.dt)
+        entity.after_update()
+    def _prepare_entity_rendering(self, entity: Entity) -> None:
+        if entity.image and entity.visible:
+            self._rendering_tasks.append(RenderingTask(entity.world_position(),
+                                                       entity.image))
 
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if event.button == 1:
-                        self.just_pressed_mouse[0] = True
-                    elif event.button == 2:
-                        self.just_pressed_mouse[1] = True
-                    elif event.button == 3:
-                        self.just_pressed_mouse[2] = True
+    def _render(self) -> None:
+        self.screen.fill(self.background_color)
+        for rendering_task in self._rendering_tasks:
+            self.screen.blit(rendering_task.surface, rendering_task.position)
+        pygame.display.flip()
 
-            self.screen.fill("black")
-            for entity in self.current_scene:
-                entity.update(self.dt)
-                if entity.graphical:
-                    self.screen.blit(entity.graphical, entity.physical)
-            pygame.display.flip()
+    def _time(self) -> None:
+        self.dt = self.clock.tick(self.FPS) / 1000
 
-            self.dt = self.clock.tick(self.FPS) / 1000
+    def _prepare_next_frame(self) -> None:
+        self._rendering_tasks.clear()
 
-    def change_current_scene(self, new_scene) -> None:
-        self.current_scene = new_scene
-        for entity in self.current_scene:
-            entity.ready(self)
-    
-    def add_pressed_key(self, key: int) -> None:
-        self.just_pressed_keys[key] = False
+    def setup_scene(self) -> None:
+        for entity in self.scene:
+            entity.setup(self)
+            entity.ready()
+
+    def add_entity(self, entity: Entity) -> None:
+        self.scene.append(entity)
+        entity.setup(self)
+        entity.ready()
+    def remove_entity(self, entity: Entity) -> None:
+        self.scene.remove(entity)
+        entity.removed_from_scene()
+        entity.remove_parent()
+        for child in list(entity.childern):
+            entity.remove_child(child)

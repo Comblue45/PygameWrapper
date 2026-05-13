@@ -1,7 +1,5 @@
-from .core import Game, Entity
-from .gui import Text, Button
+from .core import Game, Entity, RenderingTask
 
 __all__ = ["Game",
            "Entity",
-           "Text",
-           "Button"]
+           "RenderingTask"]
