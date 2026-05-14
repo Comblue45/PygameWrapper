@@ -19,7 +19,6 @@ class Game:
 
         self.just_pressed = {}
         self.just_pressed_mouse = {k: False for k in range(0,4)}
-        print(self.just_pressed_mouse)
 
         self.setup_scene()
 
