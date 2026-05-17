@@ -4,4 +4,5 @@ from .entity import Entity
 @dataclass(slots=True, frozen=True)
 class Event:
     author: Entity
-    target: Entity
+    target: Entity|set[str]|None
+    type: str
