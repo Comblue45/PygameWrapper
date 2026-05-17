@@ -20,10 +20,11 @@ class Entity:
             self.rect = self.image.get_rect()
         else:
             self.rect = Rect(0,0,0,0)
+        self._world_rect = self.rect.copy()
 
         self.parent = None
         self.set_parent(parent) if parent else None
-        self.childern = []
+        self.childern: list[Entity] = []
         self.tags = tags if tags else set()
         self.game = None
         self.visible = True
@@ -58,6 +59,12 @@ class Entity:
         pass
 
     @property
+    def position(self) -> tuple[int, int]:
+        return self.rect.topleft
+    @position.setter
+    def position(self, new_value) -> None:
+        self.rect.topleft = new_value
+    @property
     def x(self) -> int:
         return self.rect.topleft[0]
     @x.setter
@@ -82,3 +89,15 @@ class Entity:
         current_pos = self.rect.topleft
         self.rect = self.image.get_rect()
         self.rect.topleft = current_pos
+
+    def _update_world_rect(self) -> None:
+        self._world_rect.topleft = self.world_position()
+        for child in self.childern:
+            child._update_world_rect()
+
+    def is_collding(self, other_entity: Entity) -> bool:
+        self._update_world_rect()
+        other_entity._update_world_rect()
+        if self._world_rect.colliderect(other_entity._world_rect):
+            return True
+        return False

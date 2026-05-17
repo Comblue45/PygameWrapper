@@ -1,6 +1,7 @@
 import pygame
 from .entity import Entity
 from .rendering_task import RenderingTask
+from .event import Event
 
 class Game:
 
@@ -19,6 +20,8 @@ class Game:
 
         self.just_pressed = {}
         self.just_pressed_mouse = {k: False for k in range(0,4)}
+
+        self.events: set[Event] = set()
 
     def run(self) -> None:
         self.running = True
@@ -74,6 +77,7 @@ class Game:
 
     def _prepare_next_frame(self) -> None:
         self._rendering_tasks.clear()
+        self.events.clear()
 
     def setup_scene(self) -> None:
         for entity in self.scene:
