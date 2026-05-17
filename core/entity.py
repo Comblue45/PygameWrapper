@@ -77,3 +77,8 @@ class Entity:
             return self.rect.topleft
         px, py = self.parent.world_position()
         return (self.x + px, self.y + py)
+
+    def update_auto_rect(self) -> None:
+        current_pos = self.rect.topleft
+        self.rect = self.image.get_rect()
+        self.rect.topleft = current_pos

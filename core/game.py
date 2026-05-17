@@ -20,10 +20,9 @@ class Game:
         self.just_pressed = {}
         self.just_pressed_mouse = {k: False for k in range(0,4)}
 
-        self.setup_scene()
-
     def run(self) -> None:
         self.running = True
+        self.setup_scene()
 
         while self.running:
             self._update()
@@ -83,8 +82,9 @@ class Game:
 
     def add_entity(self, entity: Entity) -> None:
         self.scene.append(entity)
-        entity.setup(self)
-        entity.ready()
+        if self.running:
+            entity.setup(self)
+            entity.ready()
     def remove_entity(self, entity: Entity) -> None:
         self.scene.remove(entity)
         entity.removed_from_scene()
