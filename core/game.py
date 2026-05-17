@@ -21,7 +21,7 @@ class Game:
         self.just_pressed = {}
         self.just_pressed_mouse = {k: False for k in range(0,4)}
 
-        self.events: set[Event] = set()
+        self.events: list[Event] = []
 
     def run(self) -> None:
         self.running = True
