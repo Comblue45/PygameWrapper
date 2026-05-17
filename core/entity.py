@@ -101,3 +101,9 @@ class Entity:
         if self._world_rect.colliderect(other_entity._world_rect):
             return True
         return False
+    
+    def is_on_point(self, point: tuple[int, int]) -> bool:
+        self._update_world_rect()
+        if self._world_rect.collidepoint(point):
+            return True
+        return False
