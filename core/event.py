@@ -5,4 +5,3 @@ from .entity import Entity
 class Event:
     author: Entity
     target: Entity|set[str]|None
-    type: str
