@@ -98,3 +98,26 @@ class Game:
     
     def add_just_pressed_key(self, key: int) -> None:
         self.just_pressed[key] = False
+    
+    def get_entities_by_tags(self, tags: set[str]) -> None:
+        entities = set()
+        for tag in tags:
+            for entity in self.scene:
+                if tag in entity.tags:
+                    entities.add(entity)
+        return entities
+
+    def trigger_event(self, event: Event) -> None:
+        self._handle_event(event)
+    def _handle_event(self, event: Event) -> None:
+        if isinstance(event.target, Entity):
+            event.target.trigger_event(event)
+        elif isinstance(event.target, set):
+            for entity in self.get_entities_by_tags(event.target):
+                if entity is event.author:
+                    continue
+                entity.trigger_event(event)
+        elif not event.target:
+            for entity in self.scene:
+                if not entity == event.author:
+                    entity.trigger_event(event)

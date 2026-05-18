@@ -89,7 +89,6 @@ class Entity:
         current_pos = self.rect.topleft
         self.rect = self.image.get_rect()
         self.rect.topleft = current_pos
-
     def _update_world_rect(self) -> None:
         self._world_rect.topleft = self.world_position()
         for child in self.childern:
@@ -101,9 +100,11 @@ class Entity:
         if self._world_rect.colliderect(other_entity._world_rect):
             return True
         return False
-    
     def is_on_point(self, point: tuple[int, int]) -> bool:
         self._update_world_rect()
         if self._world_rect.collidepoint(point):
             return True
         return False
+
+    def trigger_event(self, event) -> None:
+        pass
