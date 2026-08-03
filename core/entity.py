@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from .game import Game
 
 class Entity:
-    
+
     def __init__(self, 
                  image: Surface|None = None, 
                  rect: Rect|None = None,
@@ -93,6 +93,20 @@ class Entity:
         self._world_rect.topleft = self.world_position()
         for child in self.childern:
             child._update_world_rect()
+
+    def resolve_collision_x(self, other_rect: Rect) -> None:
+        if self.rect.colliderect(other_rect):
+            if self.rect.centerx < other_rect.centerx:
+                self.rect.right = other_rect.left
+            else:
+                self.rect.left = other_rect.right
+
+    def resolve_collision_y(self, other_rect: Rect) -> None:
+        if self.rect.colliderect(other_rect):
+            if self.rect.centery < other_rect.centery:
+                self.rect.bottom = other_rect.top
+            else:
+                self.rect.top = other_rect.bottom
 
     def is_collding(self, other_entity: Entity) -> bool:
         self._update_world_rect()
