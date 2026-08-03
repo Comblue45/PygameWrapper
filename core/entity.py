@@ -12,7 +12,8 @@ class Entity:
                  rect: Rect|None = None,
                  parent: Entity|None = None,
                  tags: set[str]|None = None,
-                 auto_rect: bool = True) -> None:
+                 auto_rect: bool = True,
+                 layer: int = 0) -> None:
         self.image = image
         if rect:
             self.rect = rect
@@ -28,6 +29,7 @@ class Entity:
         self.tags = tags if tags else set()
         self.game = None
         self.visible = True
+        self.layer = layer
 
     def set_parent(self, parent: Entity) -> None:
         self.parent = parent

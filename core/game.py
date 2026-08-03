@@ -5,9 +5,9 @@ from .event import Event
 
 class Game:
 
-    def __init__(self, title: str = "PygameWrapper", background_color: str = "black", size: tuple[int, int] = (500, 500), scene: list[Entity]|None = None, FPS: int = 60) -> None:
+    def __init__(self, title: str = "PygameWrapper", background_color: str = "black", size: tuple[int, int] = (500, 500), scene: dict[int, list[Entity]]|None = None, FPS: int = 60) -> None:
         self.background_color = background_color
-        self.scene = scene if scene else []
+        self.scene: dict[int, list[Entity]] = scene if scene else {}
         self.FPS = FPS
 
         pygame.init()
@@ -54,9 +54,10 @@ class Game:
                     self.just_pressed_mouse[2] = True
 
     def _handle_entities(self) -> None:
-        for entity in self.scene:
-            self._update_entity(entity)
-            self._prepare_entity_rendering(entity)
+        for layer in self.scene.keys():
+            for entity in self.scene[layer]:
+                self._update_entity(entity)
+                self._prepare_entity_rendering(entity)
     def _update_entity(self, entity: Entity) -> None:
         entity.before_update()
         entity.update(self.dt)
@@ -80,17 +81,24 @@ class Game:
         self.events.clear()
 
     def setup_scene(self) -> None:
-        for entity in self.scene:
-            entity.setup(self)
-            entity.ready()
+        for layer in self.scene:
+            for entity in self.scene[layer]:
+                entity.setup(self)
+                entity.ready()
 
     def add_entity(self, entity: Entity) -> None:
-        self.scene.append(entity)
+        if entity.layer not in self.scene:
+            self.scene[entity.layer] = []
+        self.scene[entity.layer].append(entity)
         if self.running:
             entity.setup(self)
             entity.ready()
+    def add_entities(self, entites: list[Entity]) -> None:
+        for entity in entites:
+            self.add_entity(entity)
     def remove_entity(self, entity: Entity) -> None:
-        self.scene.remove(entity)
+        if entity.layer in self.scene:
+            self.scene[entity.layer].remove(entity)
         entity.removed_from_scene()
         entity.remove_parent()
         for child in list(entity.childern):
@@ -102,9 +110,10 @@ class Game:
     def get_entities_by_tags(self, tags: set[str]) -> None:
         entities = set()
         for tag in tags:
-            for entity in self.scene:
-                if tag in entity.tags:
-                    entities.add(entity)
+            for layer in self.scene:
+                for entity in self.scene[layer]:
+                    if tag in entity.tags:
+                        entities.add(entity)
         return entities
 
     def trigger_event(self, event: Event) -> None:
@@ -118,6 +127,10 @@ class Game:
                     continue
                 entity.trigger_event(event)
         elif not event.target:
-            for entity in self.scene:
-                if not entity == event.author:
-                    entity.trigger_event(event)
+            for layer in self.scene:
+                for entity in self.scene[layer]:
+                    if not entity == event.author:
+                        entity.trigger_event(event)
+
+    def get_fps(self) -> float:
+        return self.clock.get_fps()

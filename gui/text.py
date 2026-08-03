@@ -3,12 +3,12 @@ from ..core import Entity
 
 class Text(Entity):
 
-    def __init__(self, text: str = "", color: str = "black", size: int = 50) -> None:
+    def __init__(self, text: str = "", color: str = "black", size: int = 50, *args, **kwargs) -> None:
         self.text = text
         self.color = color
         self.size = size
         self.font = font.Font(None, self.size)
-        super().__init__(image=self.font.render(self.text, None, self.color))
+        super().__init__(image=self.font.render(self.text, None, self.color), *args, **kwargs)
     
     def update_text(self) -> None:
         self.font = font.Font(None, self.size)
