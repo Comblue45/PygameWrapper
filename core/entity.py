@@ -98,25 +98,24 @@ class Entity:
 
     def resolve_collision_x(self, other_rect: Rect, vx: float) -> None:
         if vx > 0:
-            self.rect.right = other_rect.left
+            self.rect.right = other_rect.rect.left
         elif vx < 0:
-            self.rect.left = other_rect.right
+            self.rect.left = other_rect.rect.right
         else:
-            if self.rect.centerx < other_rect.centerx:
-                self.rect.right = other_rect.left
+            if self.rect.centerx < other_rect.rect.centerx:
+                self.rect.right = other_rect.rect.left
             else:
-                self.rect.left = other_rect.right
-
+                self.rect.left = other_rect.rect.right
     def resolve_collision_y(self, other_rect: Rect, vy: float) -> None:
         if vy > 0:
-            self.rect.bottom = other_rect.top
+            self.rect.bottom = other_rect.rect.top
         elif vy < 0:
-            self.rect.top = other_rect.bottom
+            self.rect.top = other_rect.rect.bottom
         else:
-            if self.rect.centery < other_rect.centery:
-                self.rect.bottom = other_rect.top
+            if self.rect.centery < other_rect.rect.centery:
+                self.rect.bottom = other_rect.rect.top
             else:
-                self.rect.top = other_rect.bottom
+                self.rect.top = other_rect.rect.bottom
 
     def is_collding(self, other_entity: Entity) -> bool:
         self._update_world_rect()
