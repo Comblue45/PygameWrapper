@@ -2,6 +2,7 @@ import pygame
 from .entity import Entity
 from .rendering_task import RenderingTask
 from .event import Event
+from copy import copy
 
 class Game:
 
@@ -81,7 +82,7 @@ class Game:
         self.events.clear()
 
     def setup_scene(self) -> None:
-        for layer in self.scene:
+        for layer in copy(self.scene):
             for entity in self.scene[layer]:
                 entity.setup(self)
                 entity.ready()

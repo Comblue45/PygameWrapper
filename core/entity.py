@@ -1,6 +1,7 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from pygame import Surface, Rect
+import pygame
 
 if TYPE_CHECKING:
     from .game import Game
@@ -30,6 +31,7 @@ class Entity:
         self.game = None
         self.visible = True
         self.layer = layer
+        self.was_pressed = False
 
     def set_parent(self, parent: Entity) -> None:
         self.parent = parent
@@ -128,6 +130,32 @@ class Entity:
         if self._world_rect.collidepoint(point):
             return True
         return False
+
+    def is_pressed(self) -> bool:
+        if not self.game:
+            return False
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_pressed = pygame.mouse.get_pressed()
+        if self.is_on_point(mouse_pos) and mouse_pressed[0]:
+            self.was_pressed = True
+            return True
+        else:
+            self.was_pressed = False
+            return False
+    def was_just_pressed(self) -> bool:
+        if not self.game:
+            return False
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_pressed = pygame.mouse.get_pressed()
+        #print(self.was_pressed)
+        if self.is_on_point(mouse_pos) and mouse_pressed[0]:
+            #print(self.was_pressed)
+            if not self.was_pressed:
+                self.was_pressed = True
+                return True
+        else:
+            self.was_pressed = False
+            return False
 
     def trigger_event(self, event) -> None:
         pass

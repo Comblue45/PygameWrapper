@@ -1,5 +1,5 @@
 from .core import Game, Entity, RenderingTask, Event
-from .gui import Text
+from .gui import Text, Button
 from .deebug import FPSText
 
 __all__ = ["Game",
@@ -7,4 +7,5 @@ __all__ = ["Game",
            "RenderingTask",
            "Event",
            "Text",
+           "Button",
            "FPSText"]
