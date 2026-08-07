@@ -124,14 +124,11 @@ class Game:
             event.target.trigger_event(event)
         elif isinstance(event.target, set):
             for entity in self.get_entities_by_tags(event.target):
-                if entity is event.author:
-                    continue
                 entity.trigger_event(event)
         elif not event.target:
             for layer in self.scene:
                 for entity in self.scene[layer]:
-                    if not entity == event.author:
-                        entity.trigger_event(event)
+                    entity.trigger_event(event)
 
     def get_fps(self) -> float:
         return self.clock.get_fps()
